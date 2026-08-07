@@ -60,7 +60,7 @@ source "$MY_PATH/../../ensure_jar_exists.sh" || { echo "Failed to source ensure_
 
 # Parse command-line arguments
 CDM_BRANCH="master"
-CDM_VERSION=""
+CDM_VERSION="8.0.0-dev.2"
 CDM_REPO="https://github.com/finos/common-domain-model.git"
 FPML_REPO="https://github.com/rosetta-models/rune-fpml.git"
 SKIP_CDM=0
