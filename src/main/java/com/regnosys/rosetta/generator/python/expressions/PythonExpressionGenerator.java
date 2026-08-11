@@ -197,7 +197,7 @@ public final class PythonExpressionGenerator {
                 return generateFilterOperation(filter, scope);
             }
             case FirstOperation first -> {
-                return "next((x for x in (" + generateExpression(first.getArgument(), scope) + " or []) if x is not None), None)";
+                return "(lambda items: next((x for x in (items or []) if x is not None), None))(" + generateExpression(first.getArgument(), scope) + ")";
             }
             case FlattenOperation flatten -> {
                 return generateFlattenOperation(flatten, scope);
@@ -296,7 +296,7 @@ public final class PythonExpressionGenerator {
                 return generateFeatureCall(featureCall, scope);
             }
             case RosettaOnlyElement onlyElement -> {
-                return "rune_get_only_element([x for x in (" + generateExpression(onlyElement.getArgument(), scope) + " or []) if x is not None])";
+                return "(lambda items: rune_get_only_element([x for x in (items or []) if x is not None]))(" + generateExpression(onlyElement.getArgument(), scope) + ")";
             }
             case RosettaOnlyExistsExpression onlyExists -> {
                 String args = onlyExists.getArgs().stream()
@@ -373,7 +373,7 @@ public final class PythonExpressionGenerator {
         // not a subclass of the wrapped type, so the isinstance check must unwrap first.
         String targetTypeName = ((Data) expr.getType()).getName();
         if (isMulti) {
-            return "[_x for _x in (" + arg + " or []) if isinstance(rune_unwrap(_x), " + targetTypeName + ")]";
+            return "(lambda _items: [_x for _x in _items if isinstance(rune_unwrap(_x), " + targetTypeName + ")])((" + arg + " or []))";
         }
         return "(_x if isinstance(rune_unwrap(_x := (" + arg + ")), " + targetTypeName + ") else None)";
     }
@@ -987,7 +987,7 @@ public final class PythonExpressionGenerator {
     }
 
     private String generateLastOperation(LastOperation last, PythonExpressionScope scope) {
-        return "next((x for x in reversed(" + generateExpression(last.getArgument(), scope) + " or []) if x is not None), None)";
+        return "(lambda items: next((x for x in reversed(items or []) if x is not None), None))(" + generateExpression(last.getArgument(), scope) + ")";
     }
 
     private String generateSumOperation(SumOperation sum, PythonExpressionScope scope) {
