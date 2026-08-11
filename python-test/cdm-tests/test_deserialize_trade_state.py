@@ -2,7 +2,8 @@ import logging
 import os
 import pytest
 from pydantic import BaseModel, ValidationError
-import finos
+from finos.cdm.event.common.TradeState import TradeState
+from rune.runtime.base_data_class import BaseDataClass
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
