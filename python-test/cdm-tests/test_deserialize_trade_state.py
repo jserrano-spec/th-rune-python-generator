@@ -3,7 +3,6 @@ import os
 import pytest
 from pydantic import BaseModel, ValidationError
 from finos.cdm.event.common.TradeState import TradeState
-from rune.runtime.base_data_class import BaseDataClass
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -44,3 +43,46 @@ def test_deserialize_trade_state(sample: str):
     except Exception as e:
         logger.error("  Unexpected error: %s: %s", type(e).__name__, e)
         pytest.fail(f"Deserialization failed with {type(e).__name__}: {e}")
+<<<<<<< HEAD
+=======
+
+'''
+def test_deserialize_tradestate_from_file():
+    """Deserialize from a file path using BaseDataClass."""
+    logger.info("--- test_deserialize_tradestate_from_file ---")
+    logger.info("  caller      : BaseDataClass.rune_deserialize(path)")
+    logger.info("  sample      : %s", sample_path)
+    try:
+        trade_state = BaseDataClass.rune_deserialize(sample_path)
+        _log_result(trade_state)
+        logger.info("  PASSED")
+    except ValidationError as e:
+        logger.error("  ValidationError:\n%s", e)
+        pytest.fail(f"Deserialization failed with ValidationError: {e}")
+    except Exception as e:
+        logger.error("  Unexpected error: %s: %s", type(e).__name__, e)
+        pytest.fail(f"Deserialization failed with {type(e).__name__}: {e}")
+
+
+def test_deserialize_tradestate_from_file_from_TradeState():
+    """Deserialize from a file path using the concrete TradeState class."""
+    logger.info("--- test_deserialize_tradestate_from_file_from_TradeState ---")
+    logger.info("  caller      : TradeState.rune_deserialize(path)")
+    logger.info("  sample      : %s", sample_path)
+    try:
+        trade_state = TradeState.rune_deserialize(sample_path)
+        _log_result(trade_state)
+        logger.info("  PASSED")
+    except ValidationError as e:
+        logger.error("  ValidationError:\n%s", e)
+        pytest.fail(f"Deserialization failed with ValidationError: {e}")
+    except Exception as e:
+        logger.error("  Unexpected error: %s: %s", type(e).__name__, e)
+        pytest.fail(f"Deserialization failed with {type(e).__name__}: {e}")
+'''
+
+if __name__ == "__main__":
+    test_deserialize_tradestate_from_string()
+#    test_deserialize_tradestate_from_file()
+#    test_deserialize_tradestate_from_file_from_TradeState()
+>>>>>>> 1e40809 (refactor: removed temporal old files and updated cdm tests to check if last Daniel's patch worked)

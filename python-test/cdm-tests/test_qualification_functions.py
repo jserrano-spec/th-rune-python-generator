@@ -2,17 +2,6 @@ import pytest
 from pathlib import Path
 import builtins
 
-# ==============================================================================
-# BULLETPROOF WORKAROUND: Inject ALL missing types into Python's builtins 
-# This automatically catches any class the Java generator forgot to import.
-# ==============================================================================
-import finos._bundle as bundle
-for name in dir(bundle):
-    # Only grab the generated CDM classes
-    if name.startswith("finos_"):
-        setattr(builtins, name, getattr(bundle, name))
-# ==============================================================================
-
 # Import the TradeState model and the runtime attribute resolver
 from finos.cdm.event.common.TradeState import TradeState
 from rune.runtime.utils import rune_resolve_attr
@@ -38,8 +27,8 @@ def get_economic_terms(relative_path: str):
     with open(full_path, "r", encoding="utf-8") as f:
         json_data = f.read()
         
-    # Deserialize the JSON string using the Pydantic BaseDataClass classmethod
-    trade_state = TradeState.rune_deserialize(json_data)
+    # Disable strict validation so incomplete FpML samples don't crash Pydantic
+    trade_state = TradeState.rune_deserialize(json_data, validate_model=False)
     
     # Extract the EconomicTerms safely handling the Choice Type alias
     economic_terms = rune_resolve_attr(trade_state.trade.product, "economicTerms")
@@ -49,7 +38,6 @@ def get_economic_terms(relative_path: str):
 # ---------------------------------------------------------------------------
 # Test: Qualify Asset Class - Credit
 # ---------------------------------------------------------------------------
-@pytest.mark.skip(reason="On development")
 def test_should_qualify_as_asset_class_credit():
     economic_terms = get_economic_terms(
         "fpml-5-13-products-credit-derivatives/cd-ex01-long-asia-corp-fixreg.json"
@@ -57,17 +45,16 @@ def test_should_qualify_as_asset_class_credit():
     result = Qualify_AssetClass_Credit(economic_terms)
     assert result is True
 
-@pytest.mark.skip(reason="On development")
 def test_should_not_qualify_as_asset_class_credit():
     economic_terms = get_economic_terms(
         "fpml-5-13-products-fx-derivatives/fx-ex08-fx-swap.json"
     )
     result = Qualify_AssetClass_Credit(economic_terms)
     assert result is False
+    
 # ---------------------------------------------------------------------------
 # Test: Qualify Asset Class - Foreign Exchange
 # ---------------------------------------------------------------------------
-@pytest.mark.skip(reason="On development")
 def test_should_qualify_as_asset_class_foreign_exchange():
     economic_terms = get_economic_terms(
         "fpml-5-13-products-fx-derivatives/fx-ex08-fx-swap.json"
@@ -75,10 +62,21 @@ def test_should_qualify_as_asset_class_foreign_exchange():
     result = Qualify_AssetClass_ForeignExchange(economic_terms)
     assert result is True
 
-@pytest.mark.skip(reason="On development")
 def test_should_not_qualify_as_asset_class_foreign_exchange():
     economic_terms = get_economic_terms(
         "fpml-5-10-incomplete-products-credit-derivatives/cdx-index-option.json"
     )
     result = Qualify_AssetClass_ForeignExchange(economic_terms)
     assert result is False
+
+# ---------------------------------------------------------------------------
+# Test: Qualify Asset Class - Commodity
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Test: Qualify Asset Class - Equity
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Test: Qualify Asset Class - Interest Rate
+# ---------------------------------------------------------------------------
